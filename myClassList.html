@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="myDiv" class="a b c"></div>
+    <script>
+      function MyClassList(el) {
+        Object.defineProperty(this, "clazzName", {
+          set: function(clazzName) {
+            el.className = clazzName;
+          }
+        });
+      }
+
+      MyClassList.prototype = {
+        add: function(clazz) {
+          [].push.call(this, clazz);
+          this.clazzName = [].join.call(this, " ");
+        },
+        remove: function(clazz) {
+          for (var i = 0; i < this.length; i++)
+            if (this[i] === clazz) {
+              [].splice.call(this, i, 1);
+              this.clazzName = [].join.call(this, " ");
+              return clazz;
+            }
+        },
+        toggle: function(clazz) {
+          if (!this.remove(clazz)) {
+            this.add(clazz);
+          }
+        },
+        contains: function(clazz) {
+          return console.log([].indexOf.call(this, clazz) !== -1);
+        }
+      };
+
+      Object.defineProperty(HTMLElement.prototype, "myClassList", {
+        get: function() {
+          if (!this._myClassList_) {
+            this._myClassList_ = this.className.split(" ");
+            this._myClassList_.__proto__ = new MyClassList(this);
+            return this._myClassList_;
+          }
+          return this._myClassList_;
+        }
+      });
+
+      var myDiv = document.getElementById("myDiv");
+      var example = myDiv.myClassList;
+      example.add("d");
+      example.remove("c");
+      example.toggle("e");
+      example.contains("e");
+      example.toggle("e");
+      example.toggle("f");
+      console.log(example);
+    </script>
+  </body>
+</html>
